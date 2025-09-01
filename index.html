@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Brasil Capital RPG</title>
+  <style>
+    :root { --azul:#00aaff; }
+    html,body{margin:0;padding:0;background:#000;color:#fff;font-family:Arial,sans-serif;}
+    *{box-sizing:border-box;}
+    img{max-width:100%;height:auto;}
+    body{display:flex;flex-direction:column;min-height:100vh;overflow-x:hidden;}
+    .container{max-width:1100px;margin:0 auto;padding:0 16px;}
+
+    /* Header */
+    header{position:fixed;top:0;left:0;width:100%;height:60px;background:rgba(0,0,0,0.85);z-index:1001;}
+    .header-bar{height:60px;display:flex;align-items:center;justify-content:space-between;position:relative;}
+    .logo img{height:36px;width:36px;border-radius:6px;}
+    header h1{position:absolute;left:50%;transform:translateX(-50%);color:var(--azul);font-size:20px;margin:0;white-space:nowrap;}
+    .menu-btn{width:30px;height:22px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;}
+    .menu-btn span{height:4px;background:#fff;border-radius:2px;}
+
+    /* Overlay & Menu */
+    .overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:none;z-index:1500;}
+    .overlay.active{display:block;}
+    .side-menu{position:fixed;top:0;right:-250px;width:250px;height:100%;background:rgba(0,0,0,0.95);transition:right .4s ease;padding-top:80px;z-index:2001;text-align:left;box-shadow:-2px 0 5px rgba(0,0,0,0.5);}
+    .side-menu a{display:block;padding:15px 20px;color:#fff;text-decoration:none;font-weight:bold;transition:.3s;}
+    .side-menu a:hover{background:var(--azul);}
+    .side-menu a.active-link{background:var(--azul);}
+    .side-menu.active{right:0;}
+
+    /* Banner menor */
+    .banner-wrap{margin-top:60px;}
+    .banner{width:100%;max-height:320px;object-fit:cover;display:block;border-bottom:1px solid rgba(255,255,255,0.06);}
+
+    main{flex:1;}
+    .section{display:flex;flex-direction:column;gap:16px;max-width:520px;margin:18px auto 0;}
+    .box{background:rgba(0,0,0,0.7);padding:14px 16px;border-radius:6px;border:1px solid var(--azul);}
+    .box h2{color:var(--azul);font-size:18px;margin:0 0 8px;}
+    .box p{margin:0;color:#ccc;font-size:14px;line-height:1.5em;}
+    .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;}
+    .btn{background:var(--azul);color:#fff;border:none;padding:8px 14px;border-radius:6px;cursor:pointer;font-weight:bold;transition:.3s;font-size:14px;text-decoration:none;display:inline-block;}
+    .btn:hover{background:#0088cc;}
+    .muted{font-size:13px;color:#aaa;}
+    .ip-value{color:#ddd;margin-bottom:10px;font-size:14px;}
+    .copy-msg{margin-top:8px;font-size:12px;color:#0f0;display:none;}
+
+    footer{background:rgba(0,0,0,0.85);padding:24px 20px;text-align:center;margin-top:18px;}
+    .social-section h3{color:var(--azul);font-size:18px;margin-bottom:10px;}
+    .social a{margin:0 12px;display:inline-flex;}
+    .social img{width:28px;height:28px;transition:.3s;}
+    .social img:hover{transform:scale(1.1);filter:drop-shadow(0 0 5px var(--azul));}
+    .copyright{margin-top:14px;font-size:12px;color:#777;}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container header-bar">
+      <div class="logo"><img src="assets/img/logo.png" alt="Logo"></div>
+      <h1>Brasil Capital RPG</h1>
+      <div class="menu-btn" onclick="toggleMenu()"><span></span><span></span><span></span></div>
+    </div>
+  </header>
+
+  <div class="overlay" id="overlay" onclick="closeAll()"></div>
+  <nav class="side-menu" id="sideMenu">
+    <a id="linkHome" href="index.html">Início</a>
+    <a id="linkStore" href="loja.html">Loja</a>
+    <a id="linkDown" href="download.html">Download</a>
+    <a id="adminLink" href="admin.html" style="display:none;">Painel Admin</a>
+    <a id="loginLink" href="login.html">Registro/Login</a>
+    <a id="logoutLink" href="#" onclick="handleLogout();return false;" style="display:none;">Sair</a>
+  </nav>
+
+  <div class="banner-wrap container">
+    <img class="banner" src="assets/img/banner.png" alt="Banner">
+  </div>
+
+  <main class="container">
+    <div class="section">
+      <div class="box">
+        <h2>IP do Servidor</h2>
+        <p class="ip-value" id="server-ip">brasilcapitalrpg.com:7777</p>
+        <div class="row">
+          <button id="copyBtn" class="btn">📋 Copiar IP</button>
+        </div>
+        <p class="copy-msg" id="copy-msg">IP copiado!</p>
+      </div>
+
+      <div class="box">
+        <h2>Loja Oficial</h2>
+        <p>Ajude o <strong>Brasil Capital RPG</strong> adquirindo itens e serviços exclusivos. Sua contribuição mantém o servidor no ar e fortalece a comunidade.</p>
+        <div class="row"><a class="btn" href="loja.html">🛒 Ir para a Loja</a></div>
+        <p class="muted">Transparente, simples e rápido.</p>
+      </div>
+
+      <div class="box">
+        <h2>Sobre o Servidor</h2>
+        <p>O <strong>Brasil Capital RPG</strong> é um servidor de SA-MP focado em uma experiência RPG fluida e divertida. Oferecemos diversas mecânicas pensadas para um bom gameplay, eventos frequentes e uma comunidade ativa — tudo em um ambiente estável, com suporte e atualizações constantes.</p>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div class="social-section">
+        <h3>Redes Sociais</h3>
+        <div class="social">
+          <a href="#"><img src="assets/img/discord.png" alt="Discord"></a>
+          <a href="#"><img src="assets/img/instagram.png" alt="Instagram"></a>
+        </div>
+      </div>
+      <p class="copyright">© 2025 Brasil Capital RPG. Todos os direitos reservados.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Menu
+    function toggleMenu(){ document.getElementById("sideMenu").classList.toggle("active"); document.getElementById("overlay").classList.toggle("active"); }
+    function closeAll(){ document.getElementById("sideMenu").classList.remove("active"); document.getElementById("overlay").classList.remove("active"); }
+
+    // Auth menu
+    async function refreshAuthLinks(){
+      try{
+        const r=await fetch('/api/me'); const j=await r.json();
+        const isAuth=j&&j.auth, isAdmin=isAuth&&j.role==="Administrador";
+        document.getElementById('loginLink').style.display=isAuth?'none':'block';
+        document.getElementById('logoutLink').style.display=isAuth?'block':'none';
+        document.getElementById('adminLink').style.display=isAdmin?'block':'none';
+      }catch(e){}
+      setActiveMenu();
+    }
+    function setActiveMenu(){
+      const path=(location.pathname.split('/').pop()||'index.html').toLowerCase();
+      const map={"index.html":"linkHome","loja.html":"linkStore","download.html":"linkDown","admin.html":"adminLink","login.html":"loginLink"};
+      const id=map[path]||"linkHome"; const el=document.getElementById(id); if(el) el.classList.add('active-link');
+    }
+
+    // Logout unificado
+    async function handleLogout(){
+      try{ await fetch('/api/logout', {method:'POST'}); }catch(e){}
+      window.location.href = "index.html";
+    }
+
+    // Copiar IP (com fallback)
+    function copyTextToClipboard(text){
+      if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
+      return new Promise((resolve,reject)=>{
+        const ta=document.createElement('textarea'); ta.value=text; ta.style.position='fixed'; ta.style.top='-1000px'; ta.setAttribute('readonly','');
+        document.body.appendChild(ta); ta.select();
+        try{ const ok=document.execCommand('copy'); document.body.removeChild(ta); ok?resolve():reject(); }
+        catch(err){ document.body.removeChild(ta); reject(err); }
+      });
+    }
+    function showCopyMsg(){ const msg=document.getElementById("copy-msg"); msg.style.display="block"; clearTimeout(window.__copyTimer); window.__copyTimer=setTimeout(()=>msg.style.display="none",2000); }
+    document.getElementById('copyBtn').addEventListener('click', async ()=>{
+      const ip=document.getElementById('server-ip').innerText.trim();
+      try{ await copyTextToClipboard(ip); showCopyMsg(); }catch(e){ alert('Copie manualmente: '+ip); }
+    });
+
+    refreshAuthLinks();
+  </script>
+</body>
+</html>

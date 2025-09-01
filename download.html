@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Download - Brasil Capital RPG</title>
+  <style>
+    :root { --azul:#00aaff; --laranja:#ff8c00; --vermelho:#ff3333; }
+    html,body{margin:0;padding:0;background:#000;color:#fff;font-family:Arial,sans-serif;}
+    *{box-sizing:border-box;} img{max-width:100%;height:auto;}
+    body{display:flex;flex-direction:column;min-height:100vh;overflow-x:hidden;}
+    .container{max-width:1100px;margin:0 auto;padding:0 16px;}
+
+    header{position:fixed;top:0;left:0;width:100%;height:60px;background:rgba(0,0,0,0.85);z-index:1001;}
+    .header-bar{height:60px;display:flex;align-items:center;justify-content:space-between;position:relative;}
+    .logo img{height:36px;width:36px;border-radius:6px;}
+    header h1{position:absolute;left:50%;transform:translateX(-50%);color:var(--azul);font-size:20px;margin:0;white-space:nowrap;}
+    .menu-btn{width:30px;height:22px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;}
+    .menu-btn span{height:4px;background:#fff;border-radius:2px;}
+
+    .overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:none;z-index:1500;}
+    .overlay.active{display:block;}
+    .side-menu{position:fixed;top:0;right:-250px;width:250px;height:100%;background:rgba(0,0,0,0.95);transition:right .4s ease;padding-top:80px;z-index:2001;text-align:left;box-shadow:-2px 0 5px rgba(0,0,0,0.5);}
+    .side-menu a{display:block;padding:15px 20px;color:#fff;text-decoration:none;font-weight:bold;transition:.3s;}
+    .side-menu a:hover{background:var(--azul);} .side-menu a.active-link{background:var(--azul);}
+    .side-menu.active{right:0;}
+
+    .banner-wrap{margin-top:60px;}
+    .banner{width:100%;max-height:320px;object-fit:cover;display:block;border-bottom:1px solid rgba(255,255,255,0.06);}
+
+    main{flex:1;}
+    .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;max-width:900px;margin:18px auto 0;}
+    .card{background:rgba(0,0,0,0.7);border:1px solid var(--azul);border-radius:8px;padding:16px;}
+    .card h3{margin:0 0 6px;font-size:18px;}
+    .orange{color:var(--laranja);} .red{color:var(--vermelho);}
+    .card p{color:#bbb;font-size:13px;line-height:1.5em;margin:0 0 10px;}
+    .row{display:flex;gap:8px;flex-wrap:wrap;}
+    .btn{display:inline-block;padding:8px 12px;border-radius:6px;color:#fff;text-decoration:none;font-weight:bold;transition:.3s;background:var(--azul);}
+    .btn:hover{filter:brightness(1.1);}
+    .btn-orange{background:var(--laranja);} .btn-red{background:var(--vermelho);}
+    .small-thumb{width:100%;max-height:120px;object-fit:cover;border-radius:6px;margin-bottom:8px;}
+
+    /* Overlay modal Samp1 */
+    .modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#111;border:1px solid var(--azul);border-radius:8px;padding:16px;z-index:3000;display:none;text-align:center;width:90%;max-width:420px;}
+    .modal.active{display:block;}
+    .modal h4{color:var(--laranja);margin:0 0 8px;}
+    .actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:8px;}
+    .closeX{margin-top:10px;display:inline-block;padding:8px 12px;border-radius:6px;background:#444;color:#fff;text-decoration:none;font-weight:bold;}
+
+    footer{background:rgba(0,0,0,0.85);padding:24px 20px;text-align:center;margin-top:18px;}
+    .social-section h3{color:var(--azul);font-size:18px;margin-bottom:10px;}
+    .social a{margin:0 12px;display:inline-flex;}
+    .social img{width:28px;height:28px;transition:.3s;}
+    .social img:hover{transform:scale(1.1);filter:drop-shadow(0 0 5px var(--azul));}
+    .copyright{margin-top:14px;font-size:12px;color:#777;}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container header-bar">
+      <div class="logo"><img src="assets/img/logo.png" alt="Logo" /></div>
+      <h1>Brasil Capital RPG</h1>
+      <div class="menu-btn" onclick="toggleMenu()"><span></span><span></span><span></span></div>
+    </div>
+  </header>
+
+  <div class="overlay" id="overlay" onclick="overlayClick()"></div>
+  <nav class="side-menu" id="sideMenu">
+    <a id="linkHome" href="index.html">Início</a>
+    <a id="linkStore" href="loja.html">Loja</a>
+    <a id="linkDown" href="download.html">Download</a>
+    <a id="adminLink" href="admin.html" style="display:none;">Painel Admin</a>
+    <a id="loginLink" href="login.html">Registro/Login</a>
+    <a id="logoutLink" href="#" onclick="handleLogout();return false;" style="display:none;">Sair</a>
+  </nav>
+
+  <div class="banner-wrap container">
+    <img src="assets/img/bannerdownload.png" class="banner" alt="Download Banner" />
+  </div>
+
+  <main class="container">
+    <div class="cards">
+      <!-- Samp1 -->
+      <div class="card">
+        <img src="assets/img/samp1.png" class="small-thumb" alt="SAMP 1 thumb">
+        <h3><span class="orange">Samp Launcher</span></h3>
+        <p>Launcher clássico do SA-MP. Escolha sua plataforma para baixar.</p>
+        <div class="row">
+          <a class="btn btn-orange" href="#" onclick="openSamp1();return false;">Baixar</a>
+        </div>
+      </div>
+
+      <!-- Samp2 -->
+      <div class="card">
+        <img src="assets/img/samp2.png" class="small-thumb" alt="SAMP 2 thumb">
+        <h3><span class="red">Zan Samp Launcher</span></h3>
+        <p>Versão focada em dispositivos móveis.</p>
+        <div class="row">
+          <a class="btn btn-red" href="https://zansampmobile.my.id/" target="_blank" rel="noopener">Baixar</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal SAMP1 -->
+  <div class="modal" id="modalSamp1">
+    <h4>Samp Launcher</h4>
+    <div class="actions">
+      <a class="btn btn-orange" href="https://play.google.com/store/apps/details?id=ru.unisamp_mobile.launcher" target="_blank" rel="noopener">Mobile</a>
+      <a class="btn btn-orange" href="https://www.sa-mp.mp/downloads/" target="_blank" rel="noopener">PC</a>
+    </div>
+    <a href="#" class="closeX" onclick="closeSamp1();return false;">Fechar</a>
+  </div>
+
+  <footer>
+    <div class="container">
+      <div class="social-section">
+        <h3>Redes Sociais</h3>
+        <div class="social">
+          <a href="#"><img src="assets/img/discord.png" alt="Discord" /></a>
+          <a href="#"><img src="assets/img/instagram.png" alt="Instagram" /></a>
+        </div>
+      </div>
+      <p class="copyright">© 2025 Brasil Capital RPG. Todos os direitos reservados.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Menu
+    function toggleMenu(){document.getElementById('sideMenu').classList.toggle('active');document.getElementById('overlay').classList.toggle('active');}
+    function closeMenu(){document.getElementById('sideMenu').classList.remove('active');}
+    function overlayClick(){ // fecha menu e modal se clicar fora
+      const ov=document.getElementById('overlay');
+      closeMenu(); closeSamp1();
+      ov.classList.remove('active');
+    }
+
+    // Auth
+    async function refreshAuthLinks(){
+      try{
+        const r=await fetch('/api/me'); const j=await r.json();
+        const isAuth=j&&j.auth, isAdmin=isAuth&&j.role==="Administrador";
+        document.getElementById('loginLink').style.display=isAuth?'none':'block';
+        document.getElementById('logoutLink').style.display=isAuth?'block':'none';
+        document.getElementById('adminLink').style.display=isAdmin?'block':'none';
+      }catch(e){}
+      setActiveMenu();
+    }
+    function setActiveMenu(){const path=(location.pathname.split('/').pop()||'download.html').toLowerCase(); const map={"index.html":"linkHome","loja.html":"linkStore","download.html":"linkDown","admin.html":"adminLink","login.html":"loginLink"}; const id=map[path]||"linkDown"; const el=document.getElementById(id); if(el) el.classList.add('active-link');}
+
+    // Logout
+    async function handleLogout(){ try{ await fetch('/api/logout', {method:'POST'}); }catch(e){} window.location.href='index.html'; }
+
+    // Modal Samp1
+    const modal=document.getElementById('modalSamp1'); const overlay=document.getElementById('overlay');
+    function openSamp1(){ modal.classList.add('active'); overlay.classList.add('active'); }
+    function closeSamp1(){ modal.classList.remove('active'); }
+
+    refreshAuthLinks();
+  </script>
+</body>
+</html>

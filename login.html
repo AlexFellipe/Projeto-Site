@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login / Registro - Brasil Capital RPG</title>
+  <style>
+    :root { --azul:#00aaff; }
+    html,body{margin:0;padding:0;background:#000;color:#fff;font-family:Arial,sans-serif;}
+    *{box-sizing:border-box;} img{max-width:100%;height:auto;}
+    body{display:flex;flex-direction:column;min-height:100vh;overflow-x:hidden;}
+    .container{max-width:1100px;margin:0 auto;padding:0 16px;}
+
+    header{position:fixed;top:0;left:0;width:100%;height:60px;background:rgba(0,0,0,0.85);z-index:1001;}
+    .header-bar{height:60px;display:flex;align-items:center;justify-content:space-between;position:relative;}
+    .logo img{height:36px;width:36px;border-radius:6px;}
+    header h1{position:absolute;left:50%;transform:translateX(-50%);color:var(--azul);font-size:20px;margin:0;white-space:nowrap;}
+    .menu-btn{width:30px;height:22px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;}
+    .menu-btn span{height:4px;background:#fff;border-radius:2px;}
+
+    .overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:none;z-index:1500;}
+    .overlay.active{display:block;}
+    .side-menu{position:fixed;top:0;right:-250px;width:250px;height:100%;background:rgba(0,0,0,0.95);box-shadow:-2px 0 5px rgba(0,0,0,0.5);transition:right .4s ease;padding-top:80px;z-index:2001;text-align:left;}
+    .side-menu a{display:block;padding:15px 20px;color:#fff;text-decoration:none;font-weight:bold;}
+    .side-menu a:hover{background:var(--azul);} .side-menu a.active-link{background:var(--azul);}
+    .side-menu.active{right:0;}
+
+    main{flex:1;}
+    .top-space{height:60px;}
+    .wrap{display:flex;justify-content:center;padding:16px;}
+    .card{width:360px;background:rgba(0,0,0,0.7);border:1px solid var(--azul);border-radius:8px;padding:16px;}
+    .tabs{display:flex;gap:8px;margin-bottom:10px;}
+    .tab{flex:1;text-align:center;padding:8px 10px;border:1px solid var(--azul);border-radius:6px;cursor:pointer;}
+    .tab.active{background:var(--azul);color:#fff;font-weight:bold;}
+    .group{margin-bottom:10px;}
+    label{display:block;font-size:13px;color:#ccc;margin-bottom:6px;}
+    input{width:100%;padding:10px;border-radius:6px;border:1px solid #333;background:#111;color:#fff;}
+    .btn{display:inline-block;padding:10px 16px;background:var(--azul);color:#fff;font-weight:bold;border-radius:6px;text-decoration:none;border:none;cursor:pointer;}
+    .btn:hover{background:#0088cc;}
+    .msg{margin-top:10px;font-size:13px;display:none;} .msg.ok{color:#0f0;} .msg.err{color:#ff6666;}
+    .note{font-size:12px;color:#aaa;}
+    .card h3{margin:0 0 10px;color:var(--azul);}
+    .sep{height:1px;background:#222;margin:12px 0;}
+    footer{background:rgba(0,0,0,0.85);padding:24px 20px;text-align:center;margin-top:18px;}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container header-bar">
+      <div class="logo"><img src="assets/img/logo.png" alt="Logo" /></div>
+      <h1>Brasil Capital RPG</h1>
+      <div class="menu-btn" onclick="toggleMenu()"><span></span><span></span><span></span></div>
+    </div>
+  </header>
+
+  <div class="overlay" id="overlay" onclick="closeAll()"></div>
+  <nav class="side-menu" id="sideMenu">
+    <a id="linkHome" href="index.html">Início</a>
+    <a id="linkStore" href="loja.html">Loja</a>
+    <a id="linkDown" href="download.html">Download</a>
+    <a id="adminLink" href="admin.html" style="display:none;">Painel Admin</a>
+    <a id="loginLink" href="login.html">Registro/Login</a>
+    <a id="logoutLink" href="#" onclick="handleLogout();return false;" style="display:none;">Sair</a>
+  </nav>
+
+  <main class="container">
+    <div class="top-space"></div>
+
+    <div class="wrap">
+      <!-- Minha Conta (se logado) -->
+      <div class="card" id="cardAuth" style="display:none;">
+        <h3>Minha Conta</h3>
+        <div class="group"><label>E-mail</label><div id="acctEmail" class="note">—</div></div>
+        <div class="group"><label>Nome de usuário</label><div id="acctUser" class="note">—</div></div>
+        <div class="sep"></div>
+        <div class="group">
+          <label>Alterar senha</label>
+          <input type="password" id="oldPass" placeholder="Senha atual" />
+          <div style="height:6px;"></div>
+          <input type="password" id="newPass" placeholder="Nova senha (mín. 4)" />
+        </div>
+        <button class="btn" onclick="changePassword()">Salvar nova senha</button>
+        <div id="acctMsg" class="msg"></div>
+      </div>
+
+      <!-- Login/Registro -->
+      <div class="card" id="cardLogin">
+        <div class="tabs">
+          <div id="tabLogin" class="tab active" onclick="switchTab('login')">Entrar</div>
+          <div id="tabReg" class="tab" onclick="switchTab('reg')">Registrar</div>
+        </div>
+
+        <div id="paneLogin">
+          <div class="group">
+            <label for="loginEmail">E-mail</label>
+            <input type="email" id="loginEmail" placeholder="seuemail@exemplo.com" />
+          </div>
+          <div class="group">
+            <label for="loginPass">Senha</label>
+            <input type="password" id="loginPass" placeholder="••••••••" />
+          </div>
+          <button class="btn" onclick="doLogin()">Entrar</button>
+          <div id="loginMsg" class="msg"></div>
+        </div>
+
+        <div id="paneReg" style="display:none;">
+          <div class="group">
+            <label for="regUsername">Nome de usuário</label>
+            <input type="text" id="regUsername" placeholder="Seu nome no servidor" />
+          </div>
+          <div class="group">
+            <label for="regEmail">E-mail</label>
+            <input type="email" id="regEmail" placeholder="seuemail@exemplo.com" />
+          </div>
+          <div class="group">
+            <label for="regPass">Senha (mín. 4 caracteres)</label>
+            <input type="password" id="regPass" placeholder="crie uma senha" />
+          </div>
+          <button class="btn" onclick="doRegister()">Registrar</button>
+          <div id="regMsg" class="msg"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="container">© 2025 Brasil Capital RPG. Todos os direitos reservados.</footer>
+
+  <script>
+    // Menu
+    function toggleMenu(){document.getElementById('sideMenu').classList.toggle('active');document.getElementById('overlay').classList.toggle('active');}
+    function closeAll(){document.getElementById('sideMenu').classList.remove('active');document.getElementById('overlay').classList.remove('active');}
+    async function handleLogout(){try{await fetch('/api/logout',{method:'POST'});}catch(e){} window.location.href='index.html';}
+
+    // UI
+    function switchTab(which){document.getElementById('tabLogin').classList.toggle('active',which==='login');document.getElementById('tabReg').classList.toggle('active',which==='reg');document.getElementById('paneLogin').style.display=which==='login'?'block':'none';document.getElementById('paneReg').style.display=which==='reg'?'block':'none';clearMsgs();}
+    function clearMsgs(){['loginMsg','regMsg','acctMsg'].forEach(id=>{const el=document.getElementById(id);el.textContent='';el.className='msg';el.style.display='none';});}
+    function showMsg(id,text,ok=false){const el=document.getElementById(id);el.textContent=text;el.className='msg '+(ok?'ok':'err');el.style.display='block';}
+
+    // Auth
+    async function me(){try{const r=await fetch('/api/me');return await r.json();}catch(e){return {auth:false};}}
+    function setActiveMenu(){const path=(location.pathname.split('/').pop()||'login.html').toLowerCase(); const map={"index.html":"linkHome","loja.html":"linkStore","download.html":"linkDown","admin.html":"adminLink","login.html":"loginLink"}; const id=map[path]||"loginLink"; const el=document.getElementById(id); if(el) el.classList.add('active-link');}
+
+    // CSRF p/ mudar senha
+    let CSRF=null; async function ensureCSRF(){ if(CSRF) return CSRF; const r=await fetch('/api/csrf'); const j=await r.json(); if(j&&j.ok){CSRF=j.csrf; return CSRF;} throw new Error('csrf'); }
+
+    // Actions
+    async function doRegister(){
+      clearMsgs();
+      const u=document.getElementById('regUsername').value.trim();
+      const e=document.getElementById('regEmail').value.trim();
+      const p=document.getElementById('regPass').value;
+      if(!u) return showMsg('regMsg','Informe um nome de usuário.');
+      if(!e||!e.includes('@')||p.length<4) return showMsg('regMsg','Preencha e-mail válido e senha (mín. 4).');
+      const r=await fetch('/api/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,email:e,password:p})});
+      const j=await r.json();
+      if(j.ok){ showMsg('regMsg','Registrado com sucesso!',true); setTimeout(()=>{ window.location.href='index.html'; }, 700); }
+      else { showMsg('regMsg', j.error||'Erro ao registrar'); }
+    }
+    async function doLogin(){
+      clearMsgs();
+      const e=document.getElementById('loginEmail').value.trim(); const p=document.getElementById('loginPass').value;
+      if(!e||!p) return showMsg('loginMsg','Informe e-mail e senha.');
+      const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:e,password:p})}); const j=await r.json();
+      if(j.ok){ showMsg('loginMsg','Login ok!',true); setTimeout(()=>{ window.location.href='index.html'; }, 500); }
+      else { showMsg('loginMsg', j.error||'Falha no login'); }
+    }
+    async function changePassword(){
+      clearMsgs(); const oldp=document.getElementById('oldPass').value; const newp=document.getElementById('newPass').value;
+      if(newp.length<4) return showMsg('acctMsg','Nova senha muito curta');
+      try{
+        const csrf=await ensureCSRF();
+        const r=await fetch('/api/account/change_password',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify({old_password:oldp,new_password:newp})});
+        const j=await r.json();
+        if(j.ok){ showMsg('acctMsg','Senha alterada!',true); document.getElementById('oldPass').value=''; document.getElementById('newPass').value=''; }
+        else{ showMsg('acctMsg', j.error||'Erro ao alterar senha'); }
+      }catch(e){ showMsg('acctMsg','Erro de conexão'); }
+    }
+
+    (async ()=>{
+      try{
+        const info = await me();
+        const isAuth = info && info.auth;
+        const isAdmin = isAuth && info.role==='Administrador';
+        document.getElementById('loginLink').style.display=isAuth?'none':'block';
+        document.getElementById('logoutLink').style.display=isAuth?'block':'none';
+        document.getElementById('adminLink').style.display=isAdmin?'block':'none';
+
+        if(isAuth){
+          document.getElementById('cardAuth').style.display='block';
+          document.getElementById('cardLogin').style.display='none';
+          document.getElementById('acctEmail').textContent = info.email || '—';
+          document.getElementById('acctUser').textContent  = info.username || '—';
+        }else{
+          document.getElementById('cardAuth').style.display='none';
+          document.getElementById('cardLogin').style.display='block';
+        }
+      }catch(e){}
+      setActiveMenu();
+    })();
+  </script>
+</body>
+</html>

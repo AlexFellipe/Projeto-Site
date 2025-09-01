@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Loja - Brasil Capital RPG</title>
+  <style>
+    :root { --azul:#00aaff; }
+    html,body{margin:0;padding:0;background:#000;color:#fff;font-family:Arial,sans-serif;}
+    *{box-sizing:border-box;} img{max-width:100%;height:auto;}
+    body{display:flex;flex-direction:column;min-height:100vh;overflow-x:hidden;}
+    .container{max-width:1100px;margin:0 auto;padding:0 16px;}
+
+    header{position:fixed;top:0;left:0;width:100%;height:60px;background:rgba(0,0,0,0.85);z-index:1001;}
+    .header-bar{height:60px;display:flex;align-items:center;justify-content:space-between;position:relative;}
+    .logo img{height:36px;width:36px;border-radius:6px;}
+    header h1{position:absolute;left:50%;transform:translateX(-50%);color:var(--azul);font-size:20px;margin:0;white-space:nowrap;}
+    .menu-btn{width:30px;height:22px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;}
+    .menu-btn span{height:4px;background:#fff;border-radius:2px;}
+
+    .overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:none;z-index:1500;}
+    .overlay.active{display:block;}
+    .side-menu{position:fixed;top:0;right:-250px;width:250px;height:100%;background:rgba(0,0,0,0.95);transition:right .4s ease;padding-top:80px;z-index:2001;text-align:left;box-shadow:-2px 0 5px rgba(0,0,0,0.5);}
+    .side-menu a{display:block;padding:15px 20px;color:#fff;text-decoration:none;font-weight:bold;transition:.3s;}
+    .side-menu a:hover{background:var(--azul);} .side-menu a.active-link{background:var(--azul);}
+    .side-menu.active{right:0;}
+
+    main{flex:1;}
+    .top-space{height:60px;}
+    .store-hero{max-width:800px;margin:12px auto 8px;text-align:center;background:rgba(0,0,0,0.7);border:1px solid var(--azul);border-radius:6px;padding:12px 14px;}
+    .store-hero h2{color:var(--azul);font-size:20px;margin:0 0 6px;}
+    .store-hero p{color:#ccc;font-size:13px;line-height:1.5em;margin:0;}
+    .shop-container{max-width:1000px;margin:12px auto 18px;display:flex;justify-content:center;}
+    .item{width:320px;text-align:center;background:rgba(0,0,0,0.7);border:1px solid var(--azul);border-radius:6px;padding:16px;}
+    .item h3{color:var(--azul);margin:0 0 8px;font-size:20px;}
+    .item p{color:#bbb;font-size:13px;line-height:1.5em;margin:0 0 12px;}
+    .buy-btn{display:inline-block;background:var(--azul);color:#fff;padding:9px 16px;border-radius:6px;font-weight:bold;text-decoration:none;transition:.3s;font-size:14px;}
+    .buy-btn:hover{background:#0088cc;transform:scale(1.03);}
+
+    .modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#111;border:1px solid var(--azul);border-radius:8px;padding:16px;z-index:3000;display:none;text-align:center;width:90%;max-width:420px;}
+    .modal.active{display:block;}
+    .modal h3{color:var(--azul);margin:0 0 8px;font-size:18px;}
+    .rule{color:#bbb;font-size:12px;margin-bottom:10px;}
+    .input-row{display:flex;justify-content:center;margin-bottom:8px;}
+    .input-row input{width:220px;background:#222;color:#fff;border:1px solid #333;border-radius:6px;padding:8px 10px;font-size:14px;text-align:right;}
+    .price{color:#0f0;font-weight:bold;margin-bottom:10px;font-size:14px;}
+    .error{color:#ff6666;font-size:12px;display:none;margin-bottom:6px;}
+    .success{color:#0f0;font-size:13px;display:none;margin-bottom:6px;}
+    .actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
+    .confirm-btn{display:inline-block;background:var(--azul);color:#fff;padding:8px 16px;border-radius:6px;text-decoration:none;font-weight:bold;transition:.3s;font-size:14px;}
+    .confirm-btn:hover{background:#0088cc;}
+    .close-btn{background:#444;}
+
+    footer{background:rgba(0,0,0,0.85);padding:24px 20px;text-align:center;}
+    .social-section h3{color:var(--azul);font-size:18px;margin-bottom:10px;}
+    .social a{margin:0 12px;display:inline-flex;}
+    .social img{width:28px;height:28px;transition:.3s;}
+    .social img:hover{transform:scale(1.1);filter:drop-shadow(0 0 5px var(--azul));}
+    .copyright{margin-top:14px;font-size:12px;color:#777;}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container header-bar">
+      <div class="logo"><img src="assets/img/logo.png" alt="Logo" /></div>
+      <h1>Brasil Capital RPG</h1>
+      <div class="menu-btn" onclick="toggleMenu()"><span></span><span></span><span></span></div>
+    </div>
+  </header>
+
+  <div class="overlay" id="overlay" onclick="closeAll()"></div>
+  <nav class="side-menu" id="sideMenu">
+    <a id="linkHome" href="index.html">Início</a>
+    <a id="linkStore" href="loja.html">Loja</a>
+    <a id="linkDown" href="download.html">Download</a>
+    <a id="adminLink" href="admin.html" style="display:none;">Painel Admin</a>
+    <a id="loginLink" href="login.html">Registro/Login</a>
+    <a id="logoutLink" href="#" onclick="handleLogout();return false;" style="display:none;">Sair</a>
+  </nav>
+
+  <main class="container">
+    <div class="top-space"></div>
+
+    <section class="store-hero">
+      <h2>Loja Oficial</h2>
+      <p>Apoie o <strong>Brasil Capital RPG</strong> adquirindo itens e serviços exclusivos. Além de vantagens no jogo, você ajuda na manutenção do servidor.</p>
+    </section>
+
+    <section class="shop-container">
+      <div class="item">
+        <h3>Comprar Moedas</h3>
+        <p>A cada <strong>R$ 1</strong>, você recebe <strong>1.000 moedas</strong>.</p>
+        <a href="#" class="buy-btn" onclick="openCoinsModal();return false;">💰 Selecionar quantia</a>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal -->
+  <div class="modal" id="coinsModal">
+    <h3>Selecionar Quantidade</h3>
+    <div class="rule">Digite a quantidade de moedas (mínimo <strong>1.000</strong>, máximo <strong>10.000.000</strong>)</div>
+    <div class="input-row"><input id="coinsInput" type="number" min="1000" max="10000000" step="1000" value="1000" /></div>
+    <div id="errorMsg" class="error">❌ Quantidade inválida. Digite entre 1.000 e 10.000.000.</div>
+    <div id="successMsg" class="success">✅ Pedido registrado!</div>
+    <div id="price" class="price">Valor: R$ 1,00</div>
+    <div class="actions">
+      <a href="#" class="confirm-btn" onclick="confirmCoins();return false;">Continuar</a>
+      <a href="#" class="confirm-btn close-btn" onclick="closeCoinsModal();return false;">Fechar</a>
+    </div>
+  </div>
+
+  <footer>
+    <div class="container">
+      <div class="social-section">
+        <h3>Redes Sociais</h3>
+        <div class="social">
+          <a href="#"><img src="assets/img/discord.png" alt="Discord" /></a>
+          <a href="#"><img src="assets/img/instagram.png" alt="Instagram" /></a>
+        </div>
+      </div>
+      <p class="copyright">© 2025 Brasil Capital RPG. Todos os direitos reservados.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Menu
+    function toggleMenu(){document.getElementById('sideMenu').classList.toggle('active');document.getElementById('overlay').classList.toggle('active');}
+    function closeAll(){document.getElementById('sideMenu').classList.remove('active');document.getElementById('overlay').classList.remove('active');closeCoinsModal();}
+
+    // Auth
+    async function refreshAuthLinks(){
+      try{
+        const r=await fetch('/api/me'); const j=await r.json();
+        const isAuth=j&&j.auth, isAdmin=isAuth&&j.role==="Administrador";
+        document.getElementById('loginLink').style.display=isAuth?'none':'block';
+        document.getElementById('logoutLink').style.display=isAuth?'block':'none';
+        document.getElementById('adminLink').style.display=isAdmin?'block':'none';
+      }catch(e){}
+      setActiveMenu();
+    }
+    function setActiveMenu(){const path=(location.pathname.split('/').pop()||'loja.html').toLowerCase(); const map={"index.html":"linkHome","loja.html":"linkStore","download.html":"linkDown","admin.html":"adminLink","login.html":"loginLink"}; const id=map[path]||"linkStore"; const el=document.getElementById(id); if(el) el.classList.add('active-link');}
+
+    // Logout
+    async function handleLogout(){ try{ await fetch('/api/logout', {method:'POST'}); }catch(e){} window.location.href='index.html'; }
+
+    // Modal lógica
+    const coinsModal=document.getElementById('coinsModal'); const overlayEl=document.getElementById('overlay');
+    const coinsInput=document.getElementById('coinsInput'); const priceEl=document.getElementById('price'); const errorEl=document.getElementById('errorMsg'); const successEl=document.getElementById('successMsg');
+    function openCoinsModal(){coinsModal.classList.add('active');overlayEl.classList.add('active');updatePrice();}
+    function closeCoinsModal(){coinsModal.classList.remove('active');if(!document.getElementById('sideMenu').classList.contains('active')){overlayEl.classList.remove('active');}}
+    coinsInput.addEventListener('input',updatePrice);
+    function updatePrice(){const c=Number(coinsInput.value||0),min=1000,max=10000000;successEl.style.display='none';if(c<min||c>max){errorEl.style.display='block';priceEl.textContent='Valor: --';}else{errorEl.style.display='none';const r=c/1000;priceEl.textContent='Valor: R$ '+r.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});}}
+    async function confirmCoins(){
+      const c=Number(coinsInput.value||0);
+      if(c<1000||c>10000000){errorEl.style.display='block';successEl.style.display='none';return;}
+      errorEl.style.display='none';
+      try{
+        const resp = await fetch('/api/store/coins', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({coins:c})});
+        const j = await resp.json();
+        if(j.ok){
+          const r=c/1000;
+          successEl.textContent='✅ Pedido enviado! '+c.toLocaleString('pt-BR')+' moedas • Valor R$ '+r.toLocaleString('pt-BR',{minimumFractionDigits:2});
+          successEl.style.display='block';
+        }else{
+          errorEl.textContent = '❌ '+(j.error || 'Falha ao enviar pedido.');
+          errorEl.style.display='block';
+        }
+      }catch(e){ errorEl.textContent = '❌ Erro de conexão.'; errorEl.style.display='block'; }
+    }
+
+    refreshAuthLinks();
+  </script>
+</body>
+</html>

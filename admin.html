@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Administração - Brasil Capital RPG</title>
+  <style>
+    :root { --azul:#00aaff; --vermelho:#ff3333; --verde:#33cc33; --amber:#ffaa00; }
+    html,body{margin:0;padding:0;background:#000;color:#fff;font-family:Arial,sans-serif;}
+    *{box-sizing:border-box;} img{max-width:100%;height:auto;}
+    body{display:flex;flex-direction:column;min-height:100vh;overflow-x:hidden;}
+    .container{max-width:1100px;margin:0 auto;padding:0 16px;}
+
+    header{position:fixed;top:0;left:0;width:100%;height:60px;background:rgba(0,0,0,0.85);z-index:1001;}
+    .header-bar{height:60px;display:flex;align-items:center;justify-content:space-between;position:relative;}
+    .logo img{height:36px;width:36px;border-radius:6px;}
+    header h1{position:absolute;left:50%;transform:translateX(-50%);color:var(--azul);font-size:20px;margin:0;white-space:nowrap;}
+    .menu-btn{width:30px;height:22px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;}
+    .menu-btn span{height:4px;background:#fff;border-radius:2px;}
+
+    .overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:none;z-index:1500;}
+    .overlay.active{display:block;}
+    .side-menu{position:fixed;top:0;right:-250px;width:250px;height:100%;background:rgba(0,0,0,0.95);box-shadow:-2px 0 5px rgba(0,0,0,0.5);transition:right .4s ease;padding-top:80px;z-index:2001;text-align:left;}
+    .side-menu a{display:block;padding:15px 20px;color:#fff;text-decoration:none;font-weight:bold;transition:.3s;}
+    .side-menu a:hover{background:var(--azul);} .side-menu a.active-link{background:var(--azul);}
+    .side-menu.active{right:0;}
+
+    main{flex:1;}
+    .top-space{height:60px;}
+    h2{color:var(--azul);margin:16px 0 10px;}
+    .tools{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:10px;}
+    .tools input{padding:8px 10px;border-radius:6px;border:1px solid #333;background:#111;color:#fff;}
+    .tools button{padding:8px 12px;border:none;border-radius:6px;background:var(--azul);color:#fff;font-weight:bold;cursor:pointer;}
+    .tools button:hover{background:#0088cc;}
+    .msg{margin:10px 0;padding:10px;border-radius:6px;display:none;}
+    .msg.ok{background:#0f0;color:#000;} .msg.err{background:#f33;color:#fff;}
+
+    table{width:100%;border-collapse:collapse;margin-top:10px;}
+    th,td{border:1px solid #333;padding:8px;text-align:left;font-size:14px;}
+    th{background:#111;color:var(--azul);} tr:nth-child(even){background:#111;}
+    .actions button{margin:2px;padding:6px 10px;border:none;border-radius:4px;cursor:pointer;font-size:12px;}
+    .promote{background:var(--verde);color:#000;}
+    .demote{background:var(--amber);color:#000;}
+    .ban{background:var(--vermelho);color:#fff;}
+    .unban{background:#666;color:#fff;}
+    .delete{background:#444;color:#fff;}
+
+    .paginator{display:flex;gap:8px;align-items:center;justify-content:flex-end;margin-top:10px;}
+    .paginator button{padding:6px 10px;border:none;border-radius:6px;background:#222;color:#fff;cursor:pointer;}
+    .paginator button[disabled]{opacity:.4;cursor:not-allowed;}
+    footer{background:rgba(0,0,0,0.85);padding:24px 20px;text-align:center;margin-top:18px;}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container header-bar">
+      <div class="logo"><img src="assets/img/logo.png" alt="Logo" /></div>
+      <h1>Administração</h1>
+      <div class="menu-btn" onclick="toggleMenu()"><span></span><span></span><span></span></div>
+    </div>
+  </header>
+
+  <div class="overlay" id="overlay" onclick="closeAll()"></div>
+  <nav class="side-menu" id="sideMenu">
+    <a id="linkHome" href="index.html">Início</a>
+    <a id="linkStore" href="loja.html">Loja</a>
+    <a id="linkDown" href="download.html">Download</a>
+    <a id="adminLink" href="admin.html" style="display:none;">Painel Admin</a>
+    <a id="loginLink" href="login.html">Registro/Login</a>
+    <a id="logoutLink" href="#" onclick="handleLogout();return false;" style="display:none;">Sair</a>
+  </nav>
+
+  <main class="container">
+    <div class="top-space"></div>
+
+    <h2>Gerenciar Usuários</h2>
+    <div class="tools">
+      <input type="text" id="searchInput" placeholder="Buscar por e-mail, nome de usuário ou cargo..." />
+      <button onclick="applySearch()">Buscar</button>
+      <span id="countSpan" style="color:#aaa;font-size:13px;"></span>
+    </div>
+
+    <div id="msg" class="msg"></div>
+
+    <table id="usersTable" style="display:none;">
+      <thead>
+        <tr><th>Email</th><th>Nome de usuário</th><th>Cargo</th><th>Criado em</th><th>Último login</th><th>Status</th><th>Ações</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <div class="paginator">
+      <button id="prevBtn" onclick="prevPage()">◀</button>
+      <span id="pageInfo" style="font-size:13px;color:#aaa;"></span>
+      <button id="nextBtn" onclick="nextPage()">▶</button>
+    </div>
+  </main>
+
+  <footer class="container">© 2025 Brasil Capital RPG. Todos os direitos reservados.</footer>
+
+  <script>
+    // Menu
+    function toggleMenu(){document.getElementById('sideMenu').classList.toggle('active');document.getElementById('overlay').classList.toggle('active');}
+    function closeAll(){document.getElementById('sideMenu').classList.remove('active');document.getElementById('overlay').classList.remove('active');}
+
+    // Auth + ativo
+    function setActiveMenu(){
+      const path=(location.pathname.split('/').pop()||'admin.html').toLowerCase();
+      const map={"index.html":"linkHome","loja.html":"linkStore","download.html":"linkDown","admin.html":"adminLink","login.html":"loginLink"};
+      const id=map[path]||"adminLink"; const el=document.getElementById(id); if(el) el.classList.add('active-link');
+    }
+    async function refreshAuthLinks(){
+      try{
+        const r=await fetch('/api/me'); const j=await r.json();
+        const isAuth=j&&j.auth, isAdmin=isAuth&&j.role==="Administrador";
+        document.getElementById('loginLink').style.display=isAuth?'none':'block';
+        document.getElementById('logoutLink').style.display=isAuth?'block':'none';
+        document.getElementById('adminLink').style.display=isAdmin?'block':'none';
+        if(!isAuth){ window.location.href='login.html'; return; }
+        if(!isAdmin){ window.location.href='index.html'; return; }
+      }catch(e){ window.location.href='login.html'; return; }
+      setActiveMenu();
+    }
+
+    // Logout
+    async function handleLogout(){ try{ await fetch('/api/logout', {method:'POST'}); }catch(e){} window.location.href='index.html'; }
+
+    // Tabela
+    let page=1, pageSize=20, total=0, search='';
+    async function loadUsers(){
+      const table=document.getElementById('usersTable'); const tbody=table.querySelector('tbody'); const msg=document.getElementById('msg');
+      tbody.innerHTML=''; table.style.display='none'; msg.style.display='none';
+      try{
+        const r=await fetch(`/api/admin/users?search=${encodeURIComponent(search)}&page=${page}&page_size=${pageSize}`);
+        const j=await r.json();
+        total = j.total||0;
+        document.getElementById('countSpan').textContent = `Total: ${total}`;
+        j.users.forEach(u=>{
+          const tr=document.createElement('tr');
+          const created=new Date((u.created_at||0)*1000).toLocaleString('pt-BR');
+          const last=u.last_login?new Date(u.last_login*1000).toLocaleString('pt-BR'):'—';
+          const status = u.banned?'Banido':'Ativo';
+          tr.innerHTML = `
+            <td>${u.email}</td>
+            <td>${u.username||'—'}</td>
+            <td>${u.role}</td>
+            <td>${created}</td>
+            <td>${last}</td>
+            <td>${status}</td>
+            <td class="actions">
+              <button class="promote" onclick="adminAction('promote','${u.email}')">Promover</button>
+              <button class="demote"  onclick="adminAction('demote','${u.email}')">Rebaixar</button>
+              ${u.banned
+                ? `<button class="unban" onclick="adminAction('unban','${u.email}')">Desbanir</button>`
+                : `<button class="ban" onclick="adminAction('ban','${u.email}')">Banir</button>`
+              }
+              <button class="delete" onclick="confirmDelete('${u.email}')">Excluir</button>
+            </td>`;
+          tbody.appendChild(tr);
+        });
+        table.style.display='table';
+        updatePager();
+      }catch(e){
+        msg.textContent='Erro ao carregar usuários.'; msg.className='msg err'; msg.style.display='block';
+      }
+    }
+
+    function updatePager(){
+      const pi = document.getElementById('pageInfo');
+      const prev = document.getElementById('prevBtn');
+      const next = document.getElementById('nextBtn');
+      const pages = Math.max(1, Math.ceil(total / pageSize));
+      pi.textContent = `Página ${page} de ${pages}`;
+      prev.disabled = (page<=1);
+      next.disabled = (page>=pages);
+    }
+    function prevPage(){ if(page>1){ page--; loadUsers(); } }
+    function nextPage(){ const pages=Math.max(1, Math.ceil(total/pageSize)); if(page<pages){ page++; loadUsers(); } }
+    function applySearch(){ page=1; search = document.getElementById('searchInput').value.trim(); loadUsers(); }
+
+    // Ações admin
+    async function adminAction(action,email){
+      const msg=document.getElementById('msg'); msg.style.display='none';
+      try{
+        // pega CSRF
+        const rcsrf=await fetch('/api/csrf'); const jcsrf=await rcsrf.json();
+        const csrf=jcsrf.csrf;
+        const r=await fetch('/api/admin/action',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify({action,email})});
+        const j=await r.json();
+        if(j.ok){ msg.textContent=`Ação '${action}' executada em ${email}.`; msg.className='msg ok'; msg.style.display='block'; await loadUsers(); }
+        else{ msg.textContent=j.error||'Erro na ação.'; msg.className='msg err'; msg.style.display='block'; }
+      }catch(e){ msg.textContent='Erro de conexão.'; msg.className='msg err'; msg.style.display='block'; }
+    }
+    async function confirmDelete(email){ if(!confirm(`Tem certeza que deseja excluir ${email}?`)) return; adminAction('delete', email); }
+
+    (async ()=>{ await refreshAuthLinks(); await loadUsers(); })();
+  </script>
+</body>
+</html>
